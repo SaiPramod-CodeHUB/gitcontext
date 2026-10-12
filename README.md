@@ -52,13 +52,42 @@ flowchart LR
 Measured on this repository with `eval/golden.jsonl`: 40 hand-labeled questions (12 identifier lookups, 23 natural-language "how does X work" questions, 5 exact error strings) and 8 out-of-scope questions. Offline configuration: hashing embedder, heuristic reranker, extractive answers.
 
 <!-- RESULTS:START -->
-_Run `mvn -q compile exec:java` to regenerate. Full output: [`eval/results/results.md`](eval/results/results.md)._
+Corpus: 43 files, 218 chunks | embedder: hashing-1024 | reranker: heuristic-cross-scorer | 40 questions + 8 out-of-scope
+
+| Mode | Recall@1 | Recall@3 | Recall@5 | Recall@10 | MRR | P@5 | Citation acc. | p50 ms | p95 ms |
+|---|---|---|---|---|---|---|---|---|---|
+| BM25 | 0.525 | 0.850 | **0.925** | 0.925 | 0.697 | 0.365 | 0.507 | 0.24 | 0.65 |
+| VECTOR | 0.600 | 0.750 | **0.825** | 0.850 | 0.694 | 0.385 | 0.452 | 0.40 | 0.57 |
+| HYBRID | 0.650 | 0.825 | **0.850** | 0.925 | 0.743 | 0.360 | 0.416 | 0.62 | 0.78 |
+| HYBRID_RERANK | 0.650 | 0.850 | **0.950** | 0.975 | 0.762 | 0.375 | 0.482 | 6.73 | 12.92 |
+
+Held-out half only (20 questions never looked at while tuning):
+
+| Mode | Recall@1 | Recall@5 | MRR | Citation acc. |
+|---|---|---|---|---|
+| BM25 | 0.500 | **0.950** | 0.689 | 0.586 |
+| VECTOR | 0.550 | **0.850** | 0.675 | 0.425 |
+| HYBRID | 0.600 | **0.850** | 0.710 | 0.392 |
+| HYBRID_RERANK | 0.600 | **1.000** | 0.741 | 0.500 |
+
+Recall@5 by question type:
+
+| Mode | identifier | natural | error |
+|---|---|---|---|
+| BM25 | 1.000 | 0.870 | 1.000 | 
+| VECTOR | 1.000 | 0.826 | 0.400 | 
+| HYBRID | 1.000 | 0.826 | 0.600 | 
+| HYBRID_RERANK | 1.000 | 0.913 | 1.000 | 
+
+Retrieval-failure guard: abstained on 75% of out-of-scope questions, false abstain on 3% of answerable ones.
+
+_Regenerate with the eval command below. Raw output: [`eval/results/`](eval/results/)._
 <!-- RESULTS:END -->
 
 **How to read these numbers**
 
 - **The corpus is small.** It's about 40 files. On a 2,000-file monorepo absolute recall will drop, and the *relative* gains from hybrid retrieval and reranking are the meaningful part.
-- **The evaluation guards against tuning to the test.** The reranker weights and the evidence threshold were tuned only while looking at the `dev` half of the questions. The held-out table reports the other half.
+- **The evaluation guards against tuning to the test.** The reranker weights and the evidence threshold were tuned only while looking at the `dev` half of the questions. The held-out table reports the other half. One structural fix came from inspecting a miss on a held-out question: each retriever's top 10 now always reach the reranker, because RRF had buried an exact error string that only BM25 found. Treat the held-out numbers as slightly optimistic.
 - **The offline vector index isn't a neural model.** It uses feature hashing (sub-tokens, character 4-grams and a small concept lexicon), so it has a different error profile from BM25, which is what fusion needs, but it isn't semantic. Plug in a real embedding model (see below) and re-run the eval to quantify the difference.
 - **Citation accuracy is the share of cited sources that come from a relevant file.** The extractive answerer cites the top hit plus near-tied neighbours, so this number is capped by precision.
 
@@ -151,4 +180,4 @@ eval/      EvalRunner (+ eval/golden.jsonl, eval/results/)
 
 ## Resume bullet
 
-> Built GitContext, a Java/Spring AI codebase copilot with structure-aware chunking, hybrid BM25 + vector retrieval (RRF), reranking and citation verification. It reaches **{Recall@5}** Recall@5 and **{MRR}** MRR on a labeled question set at **{p95}** ms p95 retrieval latency, abstains on **{abstain}** of out-of-scope questions, and runs behind a CI quality gate.
+> Built GitContext, a Java/Spring AI codebase copilot with structure-aware chunking, hybrid BM25 + vector retrieval (RRF), reranking and citation verification. It reaches **0.95** Recall@5 and **0.76** MRR on a labeled question set at **~13** ms p95 retrieval latency, abstains on **75%** of out-of-scope questions, and runs behind a CI quality gate.

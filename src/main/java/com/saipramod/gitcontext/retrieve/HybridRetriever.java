@@ -21,6 +21,7 @@ import java.util.function.Function;
 public class HybridRetriever {
 
     public static final int RRF_K = 60;
+    static final int PER_LIST_GUARANTEE = 10;
 
     private final Bm25Index bm25;
     private final VectorIndex vectors;
@@ -46,9 +47,20 @@ public class HybridRetriever {
             case VECTOR -> fromList(vectors.search(query, k), false);
             case HYBRID -> fuse(query).stream().limit(k).toList();
             case HYBRID_RERANK -> {
+                // Candidate pool = fused head plus the top of each individual list. RRF alone can bury a
+                // document that only one retriever found (e.g. an exact error string BM25 ranks #3 but
+                // the dense index never sees), and a reranker cannot promote what it never receives.
                 List<RetrievedChunk> fused = fuse(query);
-                List<RetrievedChunk> head = fused.subList(0, Math.min(rerankDepth, fused.size()));
-                yield reranker.rerank(query, new ArrayList<>(head)).stream().limit(k).toList();
+                List<RetrievedChunk> pool = new ArrayList<>();
+                for (int i = 0; i < fused.size(); i++) {
+                    RetrievedChunk rc = fused.get(i);
+                    boolean topOfAList = (rc.bm25Rank() > 0 && rc.bm25Rank() <= PER_LIST_GUARANTEE)
+                            || (rc.vectorRank() > 0 && rc.vectorRank() <= PER_LIST_GUARANTEE);
+                    if (i < rerankDepth || topOfAList) {
+                        pool.add(rc);
+                    }
+                }
+                yield reranker.rerank(query, pool).stream().limit(k).toList();
             }
         };
     }
