@@ -1,0 +1,49 @@
+// q = question, relevant = files that answer it (any match counts as a hit); empty = out-of-scope, should abstain
+{"q": "Where is fuse implemented for combining keyword and dense results?", "relevant": ["src/main/java/com/saipramod/gitcontext/retrieve/HybridRetriever.java"], "type": "identifier"}
+{"q": "What does reindexChanged do?", "relevant": ["src/main/java/com/saipramod/gitcontext/service/CodebaseIndex.java"], "type": "identifier"}
+{"q": "Show me CitationValidator.validate", "relevant": ["src/main/java/com/saipramod/gitcontext/answer/CitationValidator.java"], "type": "identifier"}
+{"q": "How does splitIdentifier handle acronyms?", "relevant": ["src/main/java/com/saipramod/gitcontext/index/Tokenizer.java"], "type": "identifier"}
+{"q": "Where is lastCommitPerFile computed?", "relevant": ["src/main/java/com/saipramod/gitcontext/ingest/GitMetadata.java"], "type": "identifier"}
+{"q": "What is RRF_K set to?", "relevant": ["src/main/java/com/saipramod/gitcontext/retrieve/HybridRetriever.java"], "type": "identifier"}
+{"q": "stripAnnotationsAndComments", "relevant": ["src/main/java/com/saipramod/gitcontext/ingest/JavaChunker.java"], "type": "identifier"}
+{"q": "Where is hasEvidence used?", "relevant": ["src/main/java/com/saipramod/gitcontext/service/CodebaseIndex.java", "src/main/java/com/saipramod/gitcontext/service/AskService.java"], "type": "identifier"}
+{"q": "What does the LlmReranker do when parsing fails?", "relevant": ["src/main/java/com/saipramod/gitcontext/retrieve/LlmReranker.java"], "type": "identifier"}
+{"q": "indexOnStartup bean", "relevant": ["src/main/java/com/saipramod/gitcontext/config/AppConfig.java"], "type": "identifier"}
+{"q": "GitContextProperties minCosine default", "relevant": ["src/main/java/com/saipramod/gitcontext/config/GitContextProperties.java"], "type": "identifier"}
+{"q": "What modes are in RetrievalMode?", "relevant": ["src/main/java/com/saipramod/gitcontext/retrieve/RetrievalMode.java"], "type": "identifier"}
+{"q": "How is the BM25 document length normalization computed?", "relevant": ["src/main/java/com/saipramod/gitcontext/index/Bm25Index.java"], "type": "natural"}
+{"q": "How are Java files split into chunks by class and method?", "relevant": ["src/main/java/com/saipramod/gitcontext/ingest/JavaChunker.java"], "type": "natural"}
+{"q": "How does the system detect that indexed files are stale and refresh them?", "relevant": ["src/main/java/com/saipramod/gitcontext/service/CodebaseIndex.java", "src/main/java/com/saipramod/gitcontext/service/StalenessMonitor.java"], "type": "natural"}
+{"q": "How often does the background job check for changed files?", "relevant": ["src/main/java/com/saipramod/gitcontext/service/StalenessMonitor.java", "src/main/resources/application.yml", "src/main/java/com/saipramod/gitcontext/config/GitContextProperties.java"], "type": "natural"}
+{"q": "How are markdown documents split into sections?", "relevant": ["src/main/java/com/saipramod/gitcontext/ingest/MarkdownChunker.java"], "type": "natural"}
+{"q": "Which directories are ignored when walking the repository?", "relevant": ["src/main/java/com/saipramod/gitcontext/ingest/RepoIngestor.java"], "type": "natural"}
+{"q": "How does the offline embedding model turn text into a vector without a neural network?", "relevant": ["src/main/java/com/saipramod/gitcontext/index/HashingEmbedder.java"], "type": "natural"}
+{"q": "How are synonyms like remove and delete matched in vector search?", "relevant": ["src/main/java/com/saipramod/gitcontext/index/HashingEmbedder.java"], "type": "natural"}
+{"q": "What happens when the language model call throws an exception while answering?", "relevant": ["src/main/java/com/saipramod/gitcontext/service/AskService.java"], "type": "natural"}
+{"q": "What instructions does the prompt give the model about citing sources?", "relevant": ["src/main/java/com/saipramod/gitcontext/answer/LlmAnswerGenerator.java"], "type": "natural"}
+{"q": "How does the answerer work when no API key is configured?", "relevant": ["src/main/java/com/saipramod/gitcontext/answer/ExtractiveAnswerGenerator.java", "src/main/java/com/saipramod/gitcontext/config/AppConfig.java"], "type": "natural"}
+{"q": "Where are commit messages turned into searchable chunks?", "relevant": ["src/main/java/com/saipramod/gitcontext/ingest/GitMetadata.java"], "type": "natural"}
+{"q": "How is cosine similarity search done over embeddings?", "relevant": ["src/main/java/com/saipramod/gitcontext/index/VectorIndex.java"], "type": "natural"}
+{"q": "How does the reranker reward query terms that appear close together?", "relevant": ["src/main/java/com/saipramod/gitcontext/retrieve/HeuristicReranker.java"], "type": "natural"}
+{"q": "Why do doc sections get a boost for why-questions in reranking?", "relevant": ["src/main/java/com/saipramod/gitcontext/retrieve/HeuristicReranker.java"], "type": "natural"}
+{"q": "How do concurrent searches stay safe while the index is being rebuilt?", "relevant": ["src/main/java/com/saipramod/gitcontext/service/CodebaseIndex.java"], "type": "natural"}
+{"q": "What REST endpoint triggers a full re-index of a new path?", "relevant": ["src/main/java/com/saipramod/gitcontext/api/AskController.java"], "type": "natural"}
+{"q": "How do I switch the app to use Claude instead of offline mode?", "relevant": ["src/main/resources/application.yml", "README.md", "src/main/java/com/saipramod/gitcontext/config/AppConfig.java"], "type": "natural"}
+{"q": "Is there a terminal interface for asking questions?", "relevant": ["src/main/java/com/saipramod/gitcontext/cli/GitContextCli.java", "README.md"], "type": "natural"}
+{"q": "How are files too large to index filtered out?", "relevant": ["src/main/java/com/saipramod/gitcontext/ingest/RepoIngestor.java"], "type": "natural"}
+{"q": "How does the config file fallback split text into overlapping windows?", "relevant": ["src/main/java/com/saipramod/gitcontext/ingest/TextChunker.java"], "type": "natural"}
+{"q": "How are plural words normalized in tokens?", "relevant": ["src/main/java/com/saipramod/gitcontext/index/Tokenizer.java"], "type": "natural"}
+{"q": "How is a Spring AI embedding model plugged in?", "relevant": ["src/main/java/com/saipramod/gitcontext/index/SpringAiEmbedder.java", "src/main/java/com/saipramod/gitcontext/config/AppConfig.java"], "type": "natural"}
+{"q": "Where is \"Nothing indexed yet\" thrown?", "relevant": ["src/main/java/com/saipramod/gitcontext/service/CodebaseIndex.java"], "type": "error"}
+{"q": "Who returns \"Not a directory: \"?", "relevant": ["src/main/java/com/saipramod/gitcontext/api/AskController.java"], "type": "error"}
+{"q": "Where does the message 'I couldn't find this in the indexed repository' come from?", "relevant": ["src/main/java/com/saipramod/gitcontext/service/AskService.java"], "type": "error"}
+{"q": "\"Not found in the indexed code.\"", "relevant": ["src/main/java/com/saipramod/gitcontext/answer/LlmAnswerGenerator.java"], "type": "error"}
+{"q": "Where is the log line 'Stale index refreshed in' written?", "relevant": ["src/main/java/com/saipramod/gitcontext/service/StalenessMonitor.java"], "type": "error"}
+{"q": "How do we configure Kubernetes horizontal pod autoscaling?", "relevant": [], "type": "negative"}
+{"q": "What is the Stripe webhook signing secret rotation policy?", "relevant": [], "type": "negative"}
+{"q": "Which React component renders the checkout cart?", "relevant": [], "type": "negative"}
+{"q": "How are Kafka consumer offsets committed?", "relevant": [], "type": "negative"}
+{"q": "What is the Terraform module for the VPC peering?", "relevant": [], "type": "negative"}
+{"q": "How does the mobile app handle push notification tokens?", "relevant": [], "type": "negative"}
+{"q": "Where is the GraphQL resolver for user profiles?", "relevant": [], "type": "negative"}
+{"q": "How are Redis cluster failovers handled?", "relevant": [], "type": "negative"}

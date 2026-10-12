@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitContext</title>
+<style>
+  :root { --bg:#f7f7f5; --panel:#fff; --ink:#1d1d1b; --muted:#6b6b66; --line:#e3e2dc; --accent:#2f5d50; --warn:#9a5b00; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#161615; --panel:#1f1f1d; --ink:#ecebe6; --muted:#a3a29b; --line:#33332f; --accent:#7fb8a4; --warn:#e0a24a; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+  main { max-width:960px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { font-size:22px; margin:0 0 4px; } .sub { color:var(--muted); margin:0 0 20px; }
+  form { display:flex; gap:8px; flex-wrap:wrap; }
+  input, select, button { font:inherit; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:var(--panel); color:var(--ink); }
+  input { flex:1 1 360px; } button { background:var(--accent); color:#fff; border:0; cursor:pointer; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px; margin-top:16px; }
+  .answer { white-space:pre-wrap; } .meta { color:var(--muted); font-size:13px; margin-top:8px; }
+  .warn { color:var(--warn); }
+  table { width:100%; border-collapse:collapse; font-size:13px; } th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  td code { font-size:12px; word-break:break-all; } .cited { color:var(--accent); font-weight:600; }
+  .scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<main>
+  <h1>GitContext</h1>
+  <p class="sub" id="stats">Loading index…</p>
+  <form id="f">
+    <input id="q" placeholder="Where is the retry backoff configured?" autocomplete="off" required>
+    <select id="mode">
+      <option value="HYBRID_RERANK">Hybrid + rerank</option>
+      <option value="HYBRID">Hybrid (RRF)</option>
+      <option value="BM25">BM25 only</option>
+      <option value="VECTOR">Vector only</option>
+    </select>
+    <button>Ask</button>
+  </form>
+  <div id="out"></div>
+</main>
+<script>
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+fetch('/api/stats').then(r => r.json()).then(s => {
+  document.getElementById('stats').textContent =
+    `${s.files} files · ${s.chunks} chunks · embedder ${s.embedder} · reranker ${s.reranker}`;
+});
+document.getElementById('f').addEventListener('submit', async e => {
+  e.preventDefault();
+  const out = document.getElementById('out');
+  out.innerHTML = '<div class="card">Thinking…</div>';
+  const res = await fetch('/api/ask', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ question: document.getElementById('q').value, mode: document.getElementById('mode').value, k: 5 }) });
+  const a = await res.json();
+  const rows = (a.sources || []).map(s => `<tr>
+      <td class="${s.cited ? 'cited' : ''}">[${s.n}]</td><td><code>${esc(s.location)}</code></td>
+      <td>${esc(s.kind)}</td><td>${esc(s.symbol)}</td><td>${s.score}</td>
+      <td>${esc((s.commit || '').slice(0, 8))} ${esc(s.author || '')}</td></tr>`).join('');
+  out.innerHTML = `<div class="card"><div class="answer">${esc(a.answer)}</div>
+    <div class="meta">${a.abstained ? '<span class="warn">Abstained: no evidence found</span> · ' : ''}
+      ${a.grounded ? 'All citations verified' : (a.abstained ? '' : '<span class="warn">Citations not verified</span>')}
+      · retrieval ${a.retrievalMs} ms · generation ${a.generationMs} ms · ${esc(a.generator)}</div></div>
+    ${rows ? `<div class="card scroll"><table><tr><th></th><th>Location</th><th>Kind</th><th>Symbol</th><th>Score</th><th>Last commit</th></tr>${rows}</table></div>` : ''}`;
+});
+</script>
+</body>
+</html>

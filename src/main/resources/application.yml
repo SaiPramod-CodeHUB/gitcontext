@@ -1,0 +1,32 @@
+server:
+  port: ${PORT:8080}
+
+gitcontext:
+  repo-path: ${REPO_PATH:.}
+  include-commits: true
+  min-evidence: 0.45   # abstain when keyword coverage + best cosine is below this
+  staleness-check-ms: ${STALENESS_CHECK_MS:60000}
+  llm-reranker: false
+
+spring:
+  application:
+    name: gitcontext
+  ai:
+    model:
+      # "none" = offline mode (hashing embedder + heuristic reranker + extractive answers).
+      # Set LLM_PROVIDER=anthropic and ANTHROPIC_API_KEY to use Claude for answers.
+      chat: ${LLM_PROVIDER:none}
+      embedding: none
+    anthropic:
+      api-key: ${ANTHROPIC_API_KEY:not-set}
+      chat:
+        options:
+          model: ${ANTHROPIC_MODEL:claude-sonnet-5-5}
+          max-tokens: 800
+          temperature: 0.1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history so commit metadata is indexed
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Unit tests + retrieval quality gate
+        run: mvn -B verify
+      - name: Eval report
+        run: mvn -B -q compile exec:java && cat eval/results/results.md >> "$GITHUB_STEP_SUMMARY"
